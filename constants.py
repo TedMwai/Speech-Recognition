@@ -1,2 +1,0 @@
-NOTION_API_KEY = "secret_UY5XJyIoZEitl9eZd1taoQmsiwROgxAazfPpmtKUy1Y"
-database_id = "81fd0f61c5834daea22be8a524dc5a69"
