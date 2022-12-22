@@ -42,7 +42,6 @@ def play_sound(text):
         print("could not play sound")
 
 if __name__ == "__main__":
-
     while True:
         a = get_audio()
         command = audio_to_text(a)
