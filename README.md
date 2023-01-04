@@ -18,5 +18,6 @@ This project is a simple speech recognition application that uses Azure Cognitiv
 5. Create a .env file and add the following variables
     - NOTION_DATABASE_ID
     - NOTION_API_KEY
-    - AZURE_API_KEY
+    - AZURE_SPEECH_KEY
+    - AZURE_SPEECH_REGION
 6. Run the application
