@@ -1,63 +1,53 @@
-import os
-import speech_recognition as sr
-import gtts
-from playsound import playsound
-import constants
-from notion import NotionClient
 from datetime import datetime
 
-r = sr.Recognizer()
+import azure.cognitiveservices.speech as speechsdk
 
-token = constants.NOTION_API_KEY
-database_id = constants.database_id
+from constants import NOTION_API_KEY, SPEECH_KEY, SPEECH_REGION, database_id
+from notion import NotionClient
 
-client = NotionClient(token, database_id)
+client = NotionClient(NOTION_API_KEY, database_id)
+
+
+# configurations for speech recognition
+speech_config = speechsdk.SpeechConfig(
+    subscription=SPEECH_KEY, region=SPEECH_REGION)
+speech_config.speech_recognition_language = "en-US"
+audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+# configurations for speech synthesis
+speech_config.speech_synthesis_voice_name = 'en-US-JennyNeural'
+audio_config_two = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
+speech_synthesizer = speechsdk.SpeechSynthesizer(
+    speech_config=speech_config, audio_config=audio_config)
 
 ACTIVATION_COMMAND = "hello world"
 
 def get_audio():
-    with sr.Microphone() as source:
-        print("Say something")
-        audio = r.listen(source)
-    return audio
+    speech_recognizer = speechsdk.SpeechRecognizer(
+        speech_config=speech_config, audio_config=audio_config)
 
-def audio_to_text(audio):
-    text = ""
-    try:
-        text = r.recognize_google(audio)
-    except sr.UnknownValueError:
-        print("Speech recognition could not understand audio")
-    except sr.RequestError:
-        print("could not request results from API")
-    return text
+    print("Speak into your microphone.")
+    speech_recognition_result = speech_recognizer.recognize_once_async().get()
+    return speech_recognition_result.text
+
 
 def play_sound(text):
-    try:
-        tts = gtts.gTTS(text)
-        tempfile = "./temp.mp3"
-        tts.save(tempfile)
-        playsound(tempfile)
-        os.remove(tempfile)
-    except AssertionError:
-        print("could not play sound")
+    speech_synthesizer.speak_text_async(text).get()
+
 
 if __name__ == "__main__":
-    while True:
-        a = get_audio()
-        command = audio_to_text(a)
-        print(command)
+    command = get_audio()
+    print(command)
 
-        if ACTIVATION_COMMAND in command.lower():
-            print("Activated")
-            play_sound("I'm listening")
-
-            note = get_audio()
-            note = audio_to_text(note)
-            print(note)
-
-            if note:
-                play_sound("You said: " + note)
-                now = datetime.now().astimezone().isoformat()
-                res = client.create_page(note, now, status="Active")
-                if res.status_code == 200:
-                    play_sound("Stored new item")
+    if ACTIVATION_COMMAND in command.lower():
+        print("Activated")
+        play_sound("I'm listening")
+        note = get_audio()
+        print(note)
+        if note:
+            play_sound("You said: " + note)
+            now = datetime.now().astimezone().isoformat()
+            res = client.create_page(note, now, status="Active")
+            if res.status_code == 200:
+                play_sound("Stored new item")
+            else:
+                play_sound("Sorry I failed to store the note😔")
