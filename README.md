@@ -9,6 +9,7 @@ This project is a simple speech recognition application that uses Azure Cognitiv
 - Python 3.8
 - Azure Cognitive Services
 - Notion API
+- Streamlit
 
 ## How to use
 1. Clone the repository
