@@ -22,3 +22,6 @@ This project is a simple speech recognition application that uses Azure Cognitiv
     - AZURE_SPEECH_KEY
     - AZURE_SPEECH_REGION
 6. Run the application
+## Screenshots
+The application is built using Streamlit. The application has a simple UI that allows you to record your speech and save it to a Notion Database. The application also allows you to view the text that has been saved to the Notion Database.
+![alt](./screenshot.png)
